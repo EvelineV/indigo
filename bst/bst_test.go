@@ -30,3 +30,86 @@ func TestFindNode(t *testing.T) {
 		t.Errorf("Uh oh... Search does not work!")
 	}
 }
+
+func TestDeleteLeafNode(t *testing.T) {
+	root := &Node{Index: "n", Data: "root"}
+	tree := &Tree{Name: "test deleting leaf nodes", Root: root}
+	tree.Insert("a", "a")
+	tree.Insert("b", "b")
+	tree.Insert("p", "p")
+	tree.Insert("q", "q")
+	if tree.Root.Left.Index != "a" {
+		t.Errorf("failed setting up node a")
+	}
+	if tree.Root.Right.Right.Index != "q" {
+		t.Errorf("failed setting up node q")
+	}
+	if tree.Root.Left.Right.Index != "b" {
+		t.Errorf("failed setting up node b")
+	}
+	// start deleting
+	tree.Delete("q")
+	if tree.Root.Right.Right != nil {
+		t.Errorf("failed deleting node q")
+	}
+	q, found := tree.Find("q")
+	if found || q != "" {
+		t.Errorf("failed deleting node q")
+	}
+	tree.Delete("b")
+	if tree.Root.Left.Right != nil {
+		t.Errorf("failed deleting node b")
+	}
+	b, found2 := tree.Find("b")
+	if found2 || b != "" {
+		t.Errorf("failed deleting node b")
+	}
+}
+
+func TestDeleteNodeWithOneChild(t *testing.T) {
+	root := &Node{Index: "n", Data: "root"}
+	tree := &Tree{Name: "test deleting half-leaf nodes", Root: root}
+	tree.Insert("a", "a")
+	tree.Insert("b", "b")
+	tree.Insert("p", "p")
+	tree.Insert("q", "q")
+	// start deleting
+	tree.Delete("p")
+	p, found := tree.Find("p")
+	if found || p != "" {
+		t.Errorf("failed deleting node p")
+	}
+	if tree.Root.Right.Index != "q" {
+		t.Errorf("failed deleting node p and replacing it with q")
+	}
+	tree.Delete("a")
+	a, found := tree.Find("a")
+	if found || a != "" {
+		t.Errorf("failed deleting node a")
+	}
+	if tree.Root.Left.Index != "b" {
+		t.Errorf("failed deleting node a and replacing it with b")
+	}
+}
+
+func TestDeleteNodeWithTwoChildren(t *testing.T) {
+	tree := &Tree{Name: "Test deleting inner nodes", Root: &Node{Index: "root", Data: "root"}}
+	tree.Insert("n", "node to be deleted, left child of the root")
+	tree.Insert("p", "right child of n")
+	tree.Insert("k", "left child of n, replaces n")
+	tree.Insert("s", "right (only) child of p")
+	tree.Insert("h", "left (only) child of k")
+	tree.Insert("j", "right child of h")
+	tree.Insert("c", "left child of h")
+	tree.Delete("n")
+	n, found := tree.Find("n")
+	if found || n != "" {
+		t.Errorf("failed deleting node n")
+	}
+	if tree.Root.Left.Index != "k" {
+		t.Errorf("failed deleting node n and replacing it with k")
+	}
+	if tree.Root.Left.Left.Index != "h" {
+		t.Errorf("could not find node h")
+	}
+}

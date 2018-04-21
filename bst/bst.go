@@ -57,6 +57,62 @@ func (n *Node) find(s string) (string, bool) {
 	}
 }
 
+func (n *Node) findMaxChild(parent *Node) (*Node, *Node) {
+	if n == nil {
+		return nil, parent
+	}
+	if n.Right == nil {
+		return n, parent
+	}
+	return n.Right.findMaxChild(n)
+}
+
+func (n *Node) replaceNode(parent, replacement *Node) error {
+	if n == nil {
+		return errors.New("A nil node cannot be replaced.")
+	}
+	if n == parent.Left {
+		parent.Left = replacement
+		return nil
+	}
+	parent.Right = replacement
+	return nil
+}
+
+func (n *Node) deleteNode(s string, parent *Node) error {
+	if n == nil {
+		return errors.New("a nil node cannot be deleted.")
+	}
+	switch {
+	case s < n.Index:
+		return n.Left.deleteNode(s, n)
+	case s > n.Index:
+		return n.Right.deleteNode(s, n)
+	default:
+		// s == n.Index: remove this node
+		if n.Left == nil && n.Right == nil {
+			// this is a leaf node, set parent's Left and Right pointers to nil
+			n.replaceNode(parent, nil)
+			return nil
+		}
+		if n.Left == nil {
+			// node only has right child, replace the node with its child
+			n.replaceNode(parent, n.Right)
+			return nil
+		}
+		if n.Right == nil {
+			// node only has left child, replace the node with its child
+			n.replaceNode(parent, n.Left)
+			return nil
+		}
+		// node has two children. Replace node with its maximum element in the left subtree
+		replacement, rParent := n.Left.findMaxChild(n)
+		n.Index = replacement.Index
+		n.Data = replacement.Data
+		return replacement.deleteNode(replacement.Index, rParent)
+	}
+}
+
 func (t *Tree) Insert(index, data string) error {
 	if t.Root == nil {
 		t.Root = &Node{Index: index, Data: data}
@@ -70,4 +126,11 @@ func (t *Tree) Find(s string) (string, bool) {
 		return "", false
 	}
 	return t.Root.find(s)
+}
+
+func (t *Tree) Delete(s string) error {
+	if t.Root == nil {
+		return nil
+	}
+	return t.Root.deleteNode(s, nil)
 }
