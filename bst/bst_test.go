@@ -113,3 +113,28 @@ func TestDeleteNodeWithTwoChildren(t *testing.T) {
 		t.Errorf("could not find node h")
 	}
 }
+
+func TestSize(t *testing.T) {
+	tree := &Tree{Name: "Tree to calculate size", Root: &Node{Index: "7", Data: "root"}}
+	tree.Insert("5", "5")
+	tree.Insert("6", "6")
+	tree.Insert("2", "2")
+	tree.Insert("9", "9")
+	size := tree.Size()
+	if size != 5 {
+		t.Errorf("Tree size should be 5 but is %d", &size)
+	}
+}
+
+func TestHeight(t *testing.T) {
+	tree := &Tree{Name: "Tree to calculate height", Root: &Node{Index: "7", Data: "root"}}
+	tree.Insert("5", "5")
+	tree.Insert("6", "6")
+	tree.Insert("2", "2")
+	tree.Insert("9", "9")
+	tree.Insert("1", "1")
+	height := tree.Height()
+	if height != 4 {
+		t.Errorf("Tree height should be 4 but is %d", &height)
+	}
+}

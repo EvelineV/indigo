@@ -113,6 +113,25 @@ func (n *Node) deleteNode(s string, parent *Node) error {
 	}
 }
 
+func (n *Node) size() int64 {
+	if n == nil {
+		return 0
+	}
+	return n.Left.size() + n.Right.size() + 1
+}
+
+func (n *Node) height() int64 {
+	if n == nil {
+		return 0
+	}
+	heightLeftSubtree := n.Left.height()
+	heightRightSubtree := n.Right.height()
+	if heightLeftSubtree > heightRightSubtree {
+		return heightLeftSubtree + 1
+	}
+	return heightRightSubtree + 1
+}
+
 func (t *Tree) Insert(index, data string) error {
 	if t.Root == nil {
 		t.Root = &Node{Index: index, Data: data}
@@ -133,4 +152,18 @@ func (t *Tree) Delete(s string) error {
 		return nil
 	}
 	return t.Root.deleteNode(s, nil)
+}
+
+func (t *Tree) Size() int64 {
+	if t.Root == nil {
+		return 0
+	}
+	return t.Root.size()
+}
+
+func (t *Tree) Height() int64 {
+	if t.Root == nil {
+		return 0
+	}
+	return t.Root.height()
 }
